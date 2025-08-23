@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/CareConnect/static/css/main.34a1a13d.css",
+    "main.js": "/CareConnect/static/js/main.36f8a797.js",
+    "index.html": "/CareConnect/index.html",
+    "main.34a1a13d.css.map": "/CareConnect/static/css/main.34a1a13d.css.map",
+    "main.36f8a797.js.map": "/CareConnect/static/js/main.36f8a797.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.34a1a13d.css",
+    "static/js/main.36f8a797.js"
+  ]
+}

@@ -1,0 +1,62 @@
+package com.careconnect.controller;
+
+import com.careconnect.dto.LoginRequestDTO;
+import com.careconnect.dto.LoginResponseDTO;
+import com.careconnect.model.User;
+import com.careconnect.security.JwtUtil;
+import com.careconnect.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+public class AuthController {
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder; // ✅ ADD THIS
+
+    @PostMapping("/register")
+    public User register(@RequestBody User user) {
+        // ✅ Encode the password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userService.saveUser(user);
+    }
+
+    @PostMapping("/login")
+    public LoginResponseDTO login(@RequestBody LoginRequestDTO loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(), loginRequest.getPassword()
+                )
+        );
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        String token = jwtUtil.generateToken(userDetails.getUsername());
+
+        User user = userService.findByUsername(loginRequest.getUsername()).orElseThrow();
+        return new LoginResponseDTO(token, user.getRole());
+    }
+
+    @GetMapping("/test")
+    public String hello() {
+        return "CareConnect backend is working!";
+    }
+}

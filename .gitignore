@@ -1,0 +1,47 @@
+# Java / Spring Boot
+*.class
+*.jar
+*.war
+*.iml
+*.log
+*.h2.db
+target/
+build/
+
+# Maven / Gradle
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+*.log
+*.class
+*.jar
+*.war
+*.ear
+
+# Eclipse / STS
+.metadata/
+*.tmp
+*.bak
+*.settings/
+*.classpath
+*.project
+
+# Node / React
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+careconnect-frontend/build/
+careconnect-frontend/.env.local
+careconnect-frontend/.env.development
+careconnect-frontend/.env.production
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env

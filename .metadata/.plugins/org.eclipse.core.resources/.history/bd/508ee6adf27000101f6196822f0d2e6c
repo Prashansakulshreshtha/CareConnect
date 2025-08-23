@@ -1,0 +1,81 @@
+package com.careconnect.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
+
+@Component
+public class JwtUtil {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
+
+    private static final String SECRET =
+        "careconnectsecretkeycareconnectsecretkey"; 
+    private static final long EXPIRATION_TIME_MS = 1000L * 60 * 60 * 10;
+
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+
+    public String generateToken(String username) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(EXPIRATION_TIME_MS)))
+                .signWith(key)
+                .compact();
+    }
+
+    public Optional<String> extractUsername(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .setAllowedClockSkewSeconds(60)  // ← Permit 60 seconds clock skew
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return Optional.ofNullable(claims.getSubject());
+        } catch (JwtException e) {
+            log.error("Error extracting username from token: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public boolean validateToken(String token, String username) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .setAllowedClockSkewSeconds(60)  
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String tokenUsername = claims.getSubject();
+            Date expiration = claims.getExpiration();
+
+            if (!username.equals(tokenUsername)) {
+                log.warn("Token validation failed: subject mismatch. Subject is {}, expected {}", tokenUsername, username);
+                return false;
+            }
+
+            if (expiration.before(new Date())) {
+                log.warn("Token validation failed: token expired at {}", expiration);
+                return false;
+            }
+
+            return true;
+        } catch (ExpiredJwtException ex) {
+            log.warn("Token expired at {} (current time {})", ex.getClaims().getExpiration(), Instant.now());
+        } catch (JwtException ex) {
+            log.error("Token invalid: {}", ex.getMessage());
+        }
+        return false;
+    }
+}
