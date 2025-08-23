@@ -21,18 +21,23 @@ dependency-reduced-pom.xml
 *.war
 *.ear
 
-# IDEs
-.idea/
-*.iml
+# Eclipse / STS
+.metadata/
+*.tmp
+*.bak
+*.settings/
 *.classpath
 *.project
-*.settings/
 
 # Node / React
 node_modules/
 dist/
 npm-debug.log
 yarn-error.log
+careconnect-frontend/build/
+careconnect-frontend/.env.local
+careconnect-frontend/.env.development
+careconnect-frontend/.env.production
 
 # OS generated
 .DS_Store
